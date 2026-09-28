@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Leads - Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="fas fa-user-plus"></i> Leads / Enquiries</h2>
+    <span class="text-muted small">Showing up to 200 most recent</span>
+  </div>
+
+  <div class="mb-3">
+    <a href="{{ url_for('admin.leads') }}"
+       class="btn btn-sm {{ 'btn-brand' if not status_filter else 'btn-outline-secondary' }}">
+      All ({{ counts['all'] }})
+    </a>
+    {% for s in ['new', 'contacted', 'converted', 'rejected'] %}
+      <a href="{{ url_for('admin.leads', status=s) }}"
+         class="btn btn-sm {{ 'btn-brand' if status_filter == s else 'btn-outline-secondary' }}">
+        {{ s.title() }} ({{ counts[s] }})
+      </a>
+    {% endfor %}
+  </div>
+
+  {% if leads %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle bg-white">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lead in leads %}
+            <tr>
+              <td>{{ lead.id }}</td>
+              <td>{{ lead.full_name }}</td>
+              <td><a href="mailto:{{ lead.email }}">{{ lead.email }}</a></td>
+              <td>{{ lead.phone }}</td>
+              <td>
+                {% set badge = {'new': 'primary', 'contacted': 'warning', 'converted': 'success', 'rejected': 'secondary'} %}
+                <span class="badge bg-{{ badge.get(lead.status, 'secondary') }}">{{ lead.status }}</span>
+              </td>
+              <td>{{ lead.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+              <td class="text-end">
+                <a href="{{ url_for('admin.lead_detail', lead_id=lead.id) }}"
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-eye"></i> View
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i> No leads {{ 'with this status' if status_filter else 'yet' }}.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

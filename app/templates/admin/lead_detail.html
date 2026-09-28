@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Lead #{{ lead.id }} - Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="fas fa-user"></i> Lead #{{ lead.id }}</h2>
+    <a href="{{ url_for('admin.leads') }}" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Leads
+    </a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card p-4 h-100">
+        <h5 class="mb-3">Contact Info</h5>
+        <p><strong>Name:</strong> {{ lead.full_name }}</p>
+        <p><strong>Email:</strong> <a href="mailto:{{ lead.email }}">{{ lead.email }}</a></p>
+        <p><strong>Phone:</strong> {{ lead.phone }}</p>
+        <p><strong>Source:</strong> {{ lead.source }}</p>
+        <p><strong>Received:</strong> {{ lead.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        {% if lead.ip_address %}<p class="text-muted small mb-1">IP: {{ lead.ip_address }}</p>{% endif %}
+        {% if lead.user_agent %}<p class="text-muted small mb-0">UA: {{ lead.user_agent }}</p>{% endif %}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card p-4 h-100">
+        <h5 class="mb-3">Message</h5>
+        {% if lead.message %}
+          <p style="white-space: pre-wrap;">{{ lead.message }}</p>
+        {% else %}
+          <p class="text-muted fst-italic">No message provided.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-4 mt-4">
+    <h5 class="mb-3">Update Lead</h5>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          {{ form.status.label(class="form-label") }}
+          {{ form.status(class="form-select") }}
+        </div>
+        <div class="col-md-8">
+          {{ form.notes.label(class="form-label") }}
+          {{ form.notes(class="form-control", rows=2) }}
+        </div>
+      </div>
+
+      {% if lead.handled_by %}
+        <p class="text-muted small mt-3 mb-0">
+          Last handled by <strong>{{ lead.handled_by.full_name }}</strong>
+          {% if lead.handled_at %}on {{ lead.handled_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
+        </p>
+      {% endif %}
+
+      <div class="mt-3">
+        {{ form.submit(class="btn btn-brand") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
