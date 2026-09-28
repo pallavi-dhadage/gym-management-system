@@ -1,0 +1,68 @@
+﻿{% extends "base.html" %}
+{% block title %}Register - GymMS{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card p-4">
+        <h3 class="mb-3 text-center"><i class="fas fa-user-plus"></i> Create Account</h3>
+
+        <form method="POST" novalidate>
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            {{ form.full_name.label(class="form-label") }}
+            {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else "")) }}
+            {% for e in form.full_name.errors %}
+              <div class="invalid-feedback">{{ e }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), autocomplete="email") }}
+            {% for e in form.email.errors %}
+              <div class="invalid-feedback">{{ e }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.phone.label(class="form-label") }}
+            {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else "")) }}
+            {% for e in form.phone.errors %}
+              <div class="invalid-feedback">{{ e }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), autocomplete="new-password") }}
+            {% for e in form.password.errors %}
+              <div class="invalid-feedback">{{ e }}</div>
+            {% endfor %}
+            <small class="text-muted">Minimum 8 characters, letters and numbers.</small>
+          </div>
+
+          <div class="mb-3">
+            {{ form.confirm.label(class="form-label") }}
+            {{ form.confirm(class="form-control" + (" is-invalid" if form.confirm.errors else ""), autocomplete="new-password") }}
+            {% for e in form.confirm.errors %}
+              <div class="invalid-feedback">{{ e }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="d-grid">
+            {{ form.submit(class="btn btn-brand") }}
+          </div>
+        </form>
+
+        <hr class="my-3">
+        <p class="text-center mb-0">
+          Already have an account?
+          <a href="{{ url_for('auth.login') }}">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
