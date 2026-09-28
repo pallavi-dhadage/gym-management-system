@@ -35,18 +35,13 @@ def create_app(config_class=None):
     login_manager.login_message_category = 'warning'
     login_manager.session_protection = 'strong'
 
-    try:
-        from app.models.user import User
+    from app.models.user import User
 
-        @login_manager.user_loader
-        def load_user(user_id):
-            try:
-                return db.session.get(User, int(user_id))
-            except (ValueError, TypeError):
-                return None
-    except ImportError:
-        @login_manager.user_loader
-        def load_user(user_id):
+    @login_manager.user_loader
+    def load_user(user_id):
+        try:
+            return db.session.get(User, int(user_id))
+        except (ValueError, TypeError):
             return None
 
     from app.routes.main import main_bp
@@ -62,6 +57,10 @@ def create_app(config_class=None):
     app.register_blueprint(trainer_bp, url_prefix='/trainer')
 
     register_error_handlers(app)
+
+    # CLI commands
+    from app.cli import register_cli
+    register_cli(app)
 
     @app.context_processor
     def inject_globals():
