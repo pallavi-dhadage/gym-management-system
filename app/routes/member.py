@@ -1,6 +1,8 @@
+from io import BytesIO
+
 from flask import (
     Blueprint, render_template, redirect, url_for,
-    flash, abort, current_app, send_file, request
+    flash, abort, current_app, send_file
 )
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
@@ -11,10 +13,9 @@ from app import db
 from app.models.plan import Plan
 from app.models.membership import Membership
 from app.models.payment import Payment
+from app.models.note import TrainerNote
 from app.services.upi import build_upi_uri, build_qr_png_bytes
 from app.utils.logger import get_audit_logger
-
-from io import BytesIO
 
 member_bp = Blueprint('member', __name__)
 audit = get_audit_logger()
@@ -142,7 +143,6 @@ def payment():
         flash('Payment is not available for your membership state.', 'warning')
         return redirect(url_for('member.membership'))
 
-    # Check for an existing submitted payment (still awaiting admin)
     existing = (
         Payment.query
         .filter_by(user_id=current_user.id, membership_id=membership.id,
@@ -205,7 +205,6 @@ def payment_submit():
     utr = form.utr_reference.data.strip().upper()
     note = (form.member_note.data or '').strip()
 
-    # Prevent duplicates across the whole system
     if Payment.query.filter_by(utr_reference=utr).first():
         audit.warning('PAYMENT_DUPLICATE_UTR user_id=%s utr=%s',
                       current_user.id, utr)
@@ -236,3 +235,18 @@ def payment_submit():
                payment.id, current_user.id, utr, payment.amount_paise)
     flash('Payment submitted. Admin will verify shortly.', 'success')
     return redirect(url_for('member.membership'))
+
+
+# ------------------------------------------------------------------
+# Trainer notes (read-only for members)
+# ------------------------------------------------------------------
+@member_bp.route('/notes')
+@login_required
+def notes():
+    notes = (
+        TrainerNote.query
+        .filter_by(member_id=current_user.id)
+        .order_by(TrainerNote.created_at.desc())
+        .all()
+    )
+    return render_template('member/notes.html', notes=notes)
