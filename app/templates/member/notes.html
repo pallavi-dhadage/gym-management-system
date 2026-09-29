@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My Training Notes - GymMS{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4"><i class="fas fa-clipboard-list"></i> My Training Notes</h1>
+
+  {% if notes %}
+    {% for n in notes %}
+      {% set catbadge = {'workout': 'primary', 'diet': 'success', 'general': 'secondary'} %}
+      <div class="card p-4 mb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="mb-1">{{ n.title }}</h5>
+            <span class="badge bg-{{ catbadge.get(n.category, 'secondary') }}">{{ n.category }}</span>
+            <small class="text-muted ms-2">
+              by {{ n.author.full_name if n.author else 'Trainer' }}
+              — {{ n.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </small>
+          </div>
+        </div>
+        <hr>
+        <p class="mb-0" style="white-space: pre-wrap;">{{ n.body }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i>
+      Your trainer has not added any notes yet. Check back later.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

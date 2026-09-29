@@ -15,11 +15,22 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
           </li>
+
           {% if current_user.role == 'member' %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('member.membership') }}">My Membership</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('member.notes') }}">My Notes</a>
+            </li>
           {% endif %}
+
+          {% if current_user.role in ('trainer', 'admin') %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('trainer.notes_list') }}">Trainer Notes</a>
+            </li>
+          {% endif %}
+
           {% if current_user.role == 'admin' %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('admin.leads') }}">Leads</a>
@@ -28,6 +39,7 @@
               <a class="nav-link" href="{{ url_for('admin.payments') }}">Payments</a>
             </li>
           {% endif %}
+
           <li class="nav-item">
             <span class="nav-link text-info">
               <i class="fas fa-user"></i> {{ current_user.full_name }}
