@@ -1,4 +1,5 @@
 ﻿from datetime import datetime
+
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -17,6 +18,15 @@ class User(UserMixin, db.Model):
     is_active_account = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     last_login_at = db.Column(db.DateTime, nullable=True)
+
+    # One-to-one: the member's membership
+    membership = db.relationship(
+        'Membership',
+        back_populates='user',
+        uselist=False,
+        cascade='all, delete-orphan',
+        foreign_keys='Membership.user_id',
+    )
 
     # ----- Password handling -----
     def set_password(self, raw_password: str) -> None:

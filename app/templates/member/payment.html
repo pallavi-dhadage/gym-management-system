@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Pay for Membership - GymMS{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Pay for Your Membership</h1>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card p-4 h-100">
+        <h4 class="mb-3">{{ membership.plan.name }}</h4>
+        <p class="display-5 text-brand mb-1">₹{{ '%.2f'|format(amount_paise / 100) }}</p>
+        <p class="text-muted small mb-3">{{ membership.plan.duration_days }} days</p>
+
+        <ul class="list-unstyled">
+          <li class="mb-2"><strong>UPI ID:</strong> <code>{{ config.UPI_ID if config else 'gym@upi' }}</code></li>
+          <li class="mb-2"><strong>Payee Name:</strong> {{ config.UPI_PAYEE_NAME if config else 'Gym Management' }}</li>
+          <li class="mb-2"><strong>Amount:</strong> ₹{{ '%.2f'|format(amount_paise / 100) }}</li>
+        </ul>
+
+        <div class="alert alert-info small">
+          <i class="fas fa-info-circle"></i>
+          Scan the QR with any UPI app (GPay / PhonePe / Paytm / BHIM),
+          pay the exact amount, then submit the UTR/reference number below.
+        </div>
+
+        {% if existing %}
+          <div class="alert alert-warning">
+            <i class="fas fa-hourglass-half"></i>
+            You already have a payment under review (UTR: <code>{{ existing.utr_reference }}</code>).
+            Please wait for admin verification.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card p-4 h-100 text-center">
+        <h5 class="mb-3">Scan to Pay</h5>
+        <img src="{{ url_for('member.payment_qr') }}"
+             alt="UPI QR Code"
+             class="img-fluid mb-3"
+             style="max-width: 300px; margin: 0 auto;">
+        <p class="text-muted small">
+          Or copy the UPI URI:
+        </p>
+        <textarea class="form-control form-control-sm" rows="2" readonly>{{ upi_uri }}</textarea>
+      </div>
+    </div>
+  </div>
+
+  {% if not existing %}
+    <div class="card p-4 mt-4">
+      <h5 class="mb-3">Submit UTR / Reference Number</h5>
+      <form method="POST" action="{{ url_for('member.payment_submit') }}" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            {{ form.utr_reference.label(class="form-label") }}
+            {{ form.utr_reference(class="form-control" + (" is-invalid" if form.utr_reference.errors else ""), placeholder="e.g. 123456789012") }}
+            {% for e in form.utr_reference.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            <small class="text-muted">You can find this in your UPI app's transaction history.</small>
+          </div>
+          <div class="col-md-6">
+            {{ form.member_note.label(class="form-label") }}
+            {{ form.member_note(class="form-control", placeholder="Optional note") }}
+          </div>
+        </div>
+
+        <div class="mt-3">
+          {{ form.submit(class="btn btn-brand") }}
+        </div>
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

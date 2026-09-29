@@ -12,7 +12,7 @@ class Membership(db.Model):
         db.Integer,
         db.ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False,
-        unique=True,          # exactly one membership per user
+        unique=True,
         index=True,
     )
     plan_id = db.Column(
@@ -22,8 +22,6 @@ class Membership(db.Model):
         index=True,
     )
 
-    # pending → active → expired
-    # pending → cancelled
     status = db.Column(
         db.String(20), default='pending', nullable=False, index=True
     )
@@ -31,7 +29,6 @@ class Membership(db.Model):
     started_at = db.Column(db.DateTime, nullable=True)
     expires_at = db.Column(db.DateTime, nullable=True, index=True)
 
-    # Who activated it (admin)
     activated_by_id = db.Column(
         db.Integer,
         db.ForeignKey('users.id', ondelete='SET NULL'),
@@ -47,13 +44,19 @@ class Membership(db.Model):
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
 
+    # Relationships
+    user = db.relationship(
+        'User',
+        back_populates='membership',
+        foreign_keys=[user_id],
+    )
     plan = db.relationship('Plan', back_populates='memberships', lazy='joined')
     activated_by = db.relationship(
         'User', foreign_keys=[activated_by_id], lazy='joined'
     )
 
     STATUS_CHOICES = ('pending', 'active', 'expired', 'cancelled')
-    EDITABLE_STATUSES = ('pending',)     # only pending memberships can change plan
+    EDITABLE_STATUSES = ('pending',)
 
     def is_active_now(self) -> bool:
         if self.status != 'active' or self.expires_at is None:
