@@ -6,93 +6,59 @@ from flask import (
     flash, request, current_app
 )
 from flask_login import (
-    login_user, logout_user, login_required,
-    current_user
+    login_user, logout_user, login_required, current_user
 )
 from flask_wtf import FlaskForm
-from wtforms import (
-    StringField, PasswordField, BooleanField, SubmitField
-)
-from wtforms.validators import (
-    DataRequired, Email, Length, EqualTo, Regexp
-)
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, Regexp
 
 from app import db, limiter
 from app.models.user import User
+from app.models.plan import Plan
+from app.models.membership import Membership
 from app.utils.logger import get_audit_logger
 
 auth_bp = Blueprint('auth', __name__)
 audit = get_audit_logger()
 
 
-# =========================================================
-# Forms
-# =========================================================
 class RegisterForm(FlaskForm):
-    full_name = StringField(
-        'Full Name',
-        validators=[DataRequired(), Length(min=2, max=120)]
-    )
-    email = StringField(
-        'Email',
-        validators=[DataRequired(), Email(), Length(max=255)]
-    )
+    full_name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=120)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=255)])
     phone = StringField(
         'Phone',
-        validators=[
-            DataRequired(),
-            Regexp(r'^\+?[0-9]{7,15}$', message='Enter a valid phone number')
-        ]
+        validators=[DataRequired(), Regexp(r'^\+?[0-9]{7,15}$', message='Enter a valid phone number')]
     )
     password = PasswordField(
         'Password',
         validators=[
-            DataRequired(),
-            Length(min=8, max=128),
-            Regexp(
-                r'^(?=.*[A-Za-z])(?=.*\d).+$',
-                message='Password must contain at least one letter and one number'
-            )
+            DataRequired(), Length(min=8, max=128),
+            Regexp(r'^(?=.*[A-Za-z])(?=.*\d).+$',
+                   message='Password must contain at least one letter and one number')
         ]
     )
     confirm = PasswordField(
         'Confirm Password',
-        validators=[
-            DataRequired(),
-            EqualTo('password', message='Passwords must match')
-        ]
+        validators=[DataRequired(), EqualTo('password', message='Passwords must match')]
     )
     submit = SubmitField('Create Account')
 
 
 class LoginForm(FlaskForm):
-    email = StringField(
-        'Email',
-        validators=[DataRequired(), Email(), Length(max=255)]
-    )
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=255)])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
     submit = SubmitField('Login')
 
 
-# =========================================================
-# Helpers
-# =========================================================
 def _is_safe_url(target: str) -> bool:
-    """Only allow redirects back to our own host."""
     if not target:
         return False
     ref = urlparse(request.host_url)
     test = urlparse(target)
-    return (
-        test.scheme in ('http', 'https')
-        and ref.netloc == test.netloc
-    )
+    return test.scheme in ('http', 'https') and ref.netloc == test.netloc
 
 
-# =========================================================
-# Routes
-# =========================================================
 @auth_bp.route('/register', methods=['GET', 'POST'])
 @limiter.limit('10 per hour', methods=['POST'])
 def register():
@@ -100,14 +66,23 @@ def register():
         return redirect(url_for('main.dashboard'))
 
     form = RegisterForm()
+
+    # Pre-select plan from query string (e.g. from pricing page)
+    plan_id_raw = request.args.get('plan', type=int)
+    preselected_plan = None
+    if plan_id_raw:
+        preselected_plan = db.session.get(Plan, plan_id_raw)
+        if preselected_plan and not preselected_plan.is_active:
+            preselected_plan = None
+
     if form.validate_on_submit():
         email = form.email.data.strip().lower()
 
         if User.query.filter_by(email=email).first():
-            audit.info('REGISTER_DUPLICATE email=%s ip=%s',
-                       email, request.remote_addr)
+            audit.info('REGISTER_DUPLICATE email=%s ip=%s', email, request.remote_addr)
             flash('An account with this email already exists.', 'danger')
-            return render_template('auth/register.html', form=form), 400
+            return render_template('auth/register.html', form=form,
+                                   preselected_plan=preselected_plan), 400
 
         user = User(
             email=email,
@@ -117,22 +92,47 @@ def register():
         )
         user.set_password(form.password.data)
 
+        # Also pick up plan_id from a hidden form field (safer than only query)
+        form_plan_id = request.form.get('plan_id', type=int)
+        if form_plan_id:
+            form_plan = db.session.get(Plan, form_plan_id)
+            if form_plan and form_plan.is_active:
+                preselected_plan = form_plan
+
         try:
             db.session.add(user)
+            db.session.flush()   # get user.id
+
+            if preselected_plan:
+                membership = Membership(
+                    user_id=user.id,
+                    plan_id=preselected_plan.id,
+                    status='pending',
+                )
+                db.session.add(membership)
+                audit.info('MEMBERSHIP_CREATED user_id=%s plan=%s (at registration)',
+                           user.id, preselected_plan.code)
+
             db.session.commit()
         except Exception:
             db.session.rollback()
             current_app.logger.exception('REGISTER_FAILED email=%s', email)
             flash('Registration failed. Please try again.', 'danger')
-            return render_template('auth/register.html', form=form), 500
+            return render_template('auth/register.html', form=form,
+                                   preselected_plan=preselected_plan), 500
 
         audit.info('REGISTER_SUCCESS user_id=%s email=%s ip=%s',
                    user.id, user.email, request.remote_addr)
         current_app.logger.info('New user registered: %s', user.email)
-        flash('Account created. Please log in.', 'success')
+
+        if preselected_plan:
+            flash(f'Account created with "{preselected_plan.name}" plan (pending payment).', 'success')
+        else:
+            flash('Account created. Please log in.', 'success')
         return redirect(url_for('auth.login'))
 
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/register.html', form=form,
+                           preselected_plan=preselected_plan)
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])

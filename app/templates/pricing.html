@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Pricing - GymMS{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-2">Membership Plans</h1>
+  <p class="text-center text-muted mb-5">
+    All plans include full gym access, locker, and app access.
+  </p>
+
+  <div class="row g-4 justify-content-center">
+    {% for plan in plans %}
+      <div class="col-md-4">
+        <div class="card h-100 p-4">
+          <h4 class="mb-1">{{ plan.name }}</h4>
+          <p class="text-muted small mb-3">{{ plan.description or '' }}</p>
+          <p class="display-5 text-brand mb-1">₹{{ '%.2f'|format(plan.price_rupees) }}</p>
+          <p class="text-muted small mb-4">for {{ plan.duration_days }} days</p>
+
+          {% if current_user.is_authenticated %}
+            {% if current_user.role == 'member' %}
+              <form method="POST" action="{{ url_for('member.select_plan', plan_id=plan.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-brand w-100">Select This Plan</button>
+              </form>
+            {% else %}
+              <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary w-100">
+                Go to Dashboard
+              </a>
+            {% endif %}
+          {% else %}
+            <a href="{{ url_for('auth.register', plan=plan.id) }}" class="btn btn-brand w-100">
+              Register &amp; Choose
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <div class="col-12 text-center text-muted">
+        <p>No plans available right now.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

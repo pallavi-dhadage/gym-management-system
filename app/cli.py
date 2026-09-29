@@ -4,6 +4,7 @@ from flask import current_app
 
 from app import db
 from app.models.user import User
+from app.models.plan import Plan
 from app.utils.logger import get_audit_logger
 
 
@@ -69,6 +70,57 @@ def list_users_command():
                    f'{str(u.is_active_account):<7} {u.full_name}')
 
 
+@click.command('seed-plans')
+@with_appcontext
+def seed_plans_command():
+    """Seed the default membership plans (idempotent)."""
+    defaults = [
+        dict(
+            code='basic-30',
+            name='Basic Monthly',
+            description='Gym access for 30 days.',
+            price_paise=99900,
+            duration_days=30,
+            sort_order=1,
+        ),
+        dict(
+            code='pro-90',
+            name='Pro Quarterly',
+            description='Gym + 2 PT sessions per month, 90 days.',
+            price_paise=249900,
+            duration_days=90,
+            sort_order=2,
+        ),
+        dict(
+            code='elite-365',
+            name='Elite Yearly',
+            description='Gym + weekly PT + diet plan, 365 days.',
+            price_paise=899900,
+            duration_days=365,
+            sort_order=3,
+        ),
+    ]
+
+    created = 0
+    for spec in defaults:
+        existing = Plan.query.filter_by(code=spec['code']).first()
+        if existing:
+            continue
+        db.session.add(Plan(**spec))
+        created += 1
+
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception('SEED_PLANS_FAILED')
+        click.echo('ERROR: could not seed plans. See logs.')
+        raise SystemExit(1)
+
+    click.echo(f'Seeded {created} plan(s). Total plans: {Plan.query.count()}')
+
+
 def register_cli(app):
     app.cli.add_command(create_admin_command)
     app.cli.add_command(list_users_command)
+    app.cli.add_command(seed_plans_command)

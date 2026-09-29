@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}My Membership - GymMS{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">My Membership</h1>
+
+  {% if not membership %}
+    <div class="alert alert-warning">
+      You have not selected a plan yet.
+      <a href="{{ url_for('member.plans') }}" class="alert-link">Choose a plan →</a>
+    </div>
+  {% else %}
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">{{ membership.plan.name }}</h3>
+        {% set badge = {'pending': 'warning', 'active': 'success', 'expired': 'secondary', 'cancelled': 'danger'} %}
+        <span class="badge bg-{{ badge.get(membership.status, 'secondary') }} fs-6">
+          {{ membership.status|upper }}
+        </span>
+      </div>
+
+      <p class="text-muted">{{ membership.plan.description or '' }}</p>
+
+      <ul class="list-unstyled">
+        <li class="mb-2"><strong>Price:</strong> ₹{{ '%.2f'|format(membership.plan.price_rupees) }}</li>
+        <li class="mb-2"><strong>Duration:</strong> {{ membership.plan.duration_days }} days</li>
+        <li class="mb-2"><strong>Started:</strong>
+          {{ membership.started_at.strftime('%Y-%m-%d') if membership.started_at else '—' }}
+        </li>
+        <li class="mb-2"><strong>Expires:</strong>
+          {{ membership.expires_at.strftime('%Y-%m-%d') if membership.expires_at else '—' }}
+        </li>
+        {% if membership.status == 'active' %}
+          <li class="mb-2"><strong>Days remaining:</strong> {{ membership.days_remaining() }}</li>
+        {% endif %}
+      </ul>
+
+      {% if membership.status == 'pending' %}
+        <div class="alert alert-warning mt-3">
+          <i class="fas fa-hourglass-half"></i>
+          Your membership is <strong>pending</strong>. Please complete the payment
+          to activate. You may still change your plan while pending.
+        </div>
+      {% elif membership.status == 'active' %}
+        <div class="alert alert-success mt-3">
+          <i class="fas fa-check-circle"></i> Your membership is active. Enjoy!
+        </div>
+      {% endif %}
+
+      <div class="mt-3">
+        <a href="{{ url_for('member.plans') }}" class="btn btn-outline-primary">
+          {{ 'Change Plan' if membership.can_change_plan() else 'View Plans' }}
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Choose Plan - GymMS{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Choose Your Plan</h1>
+
+  {% if membership %}
+    <div class="alert alert-info">
+      Current plan: <strong>{{ membership.plan.name }}</strong>
+      (status: {{ membership.status }})
+      {% if not membership.can_change_plan() %}
+        — this plan is locked and cannot be changed here.
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+    {% for plan in plans %}
+      <div class="col-md-4">
+        <div class="card h-100 p-4">
+          <h4>{{ plan.name }}</h4>
+          <p class="text-muted small">{{ plan.description or '' }}</p>
+          <p class="display-6 text-brand mb-1">₹{{ '%.2f'|format(plan.price_rupees) }}</p>
+          <p class="text-muted small mb-3">{{ plan.duration_days }} days</p>
+
+          {% if membership and membership.plan_id == plan.id %}
+            <button class="btn btn-outline-secondary w-100" disabled>Current Plan</button>
+          {% elif membership and not membership.can_change_plan() %}
+            <button class="btn btn-outline-secondary w-100" disabled>Locked</button>
+          {% else %}
+            <form method="POST" action="{{ url_for('member.select_plan', plan_id=plan.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-brand w-100">
+                {{ 'Switch to This Plan' if membership else 'Select This Plan' }}
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <div class="col-12 text-center text-muted"><p>No plans available.</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
