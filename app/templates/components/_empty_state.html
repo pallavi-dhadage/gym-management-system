@@ -1,0 +1,17 @@
+{#
+  Usage:
+    {% with icon='box-open', title='Nothing here', text='Add something to get started',
+            action_url=url_for('some.route'), action_label='Create' %}
+      {% include 'components/_empty_state.html' %}
+    {% endwith %}
+#}
+<div class="empty-state">
+  <i class="fas fa-{{ icon|default('inbox') }} d-block"></i>
+  <h5>{{ title|default('Nothing to show') }}</h5>
+  <p>{{ text|default('Check back later.') }}</p>
+  {% if action_url is defined and action_label is defined %}
+    <a href="{{ action_url }}" class="btn btn-brand mt-3">
+      <i class="fas fa-plus me-2"></i>{{ action_label }}
+    </a>
+  {% endif %}
+</div>

@@ -1,48 +1,68 @@
 {% extends "base.html" %}
 {% block title %}Login - GymMS{% endblock %}
 {% block content %}
+
 <div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-5 col-lg-4">
-      <div class="card p-4">
-        <h3 class="mb-3 text-center"><i class="fas fa-sign-in-alt"></i> Login</h3>
+  <div class="row justify-content-center align-items-center g-4" style="min-height:60vh;">
+    <!-- Left visual -->
+    <div class="col-lg-6 d-none d-lg-block">
+      <div class="p-5 rounded-4" style="background:linear-gradient(135deg,var(--dark),var(--dark-2));color:#fff;height:100%;">
+        <div class="feature-icon orange mb-3"><i class="fas fa-dumbbell"></i></div>
+        <h2 style="color:#fff;font-weight:800;letter-spacing:-.02em;">Welcome back.</h2>
+        <p style="color:rgba(255,255,255,.7);">
+          Pick up right where you left off — track memberships, payments, and training.
+        </p>
+        <ul class="list-unstyled mt-4 d-grid gap-3">
+          <li><i class="fas fa-check-circle text-brand me-2"></i>Automatic renewal reminders</li>
+          <li><i class="fas fa-check-circle text-brand me-2"></i>Personalized training notes</li>
+          <li><i class="fas fa-check-circle text-brand me-2"></i>Instant UPI payments</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right form -->
+    <div class="col-lg-5">
+      <div class="card p-4 p-lg-5" style="box-shadow:var(--shadow-md);">
+        <h3 class="mb-1">Sign in</h3>
+        <p class="text-muted small mb-4">Enter your credentials to continue.</p>
 
         <form method="POST" novalidate>
           {{ form.hidden_tag() }}
 
           <div class="mb-3">
             {{ form.email.label(class="form-label") }}
-            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), autocomplete="email") }}
-            {% for e in form.email.errors %}
-              <div class="invalid-feedback">{{ e }}</div>
-            {% endfor %}
+            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                          autocomplete="email", placeholder="you@example.com") }}
+            {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
           </div>
 
           <div class="mb-3">
-            {{ form.password.label(class="form-label") }}
-            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), autocomplete="current-password") }}
-            {% for e in form.password.errors %}
-              <div class="invalid-feedback">{{ e }}</div>
-            {% endfor %}
+            <div class="d-flex justify-content-between align-items-center">
+              {{ form.password.label(class="form-label mb-0") }}
+              <a href="#" class="small text-muted" tabindex="-1">Forgot?</a>
+            </div>
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                             autocomplete="current-password", placeholder="••••••••") }}
+            {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
           </div>
 
           <div class="form-check mb-3">
             {{ form.remember(class="form-check-input") }}
-            {{ form.remember.label(class="form-check-label") }}
+            {{ form.remember.label(class="form-check-label small") }}
           </div>
 
           <div class="d-grid">
-            {{ form.submit(class="btn btn-brand") }}
+            {{ form.submit(class="btn btn-brand btn-lg") }}
           </div>
         </form>
 
-        <hr class="my-3">
-        <p class="text-center mb-0">
-          New here?
-          <a href="{{ url_for('auth.register') }}">Create an account</a>
+        <hr class="my-4">
+        <p class="text-center mb-0 small">
+          New here? <a href="{{ url_for('auth.register') }}" class="fw-semibold">Create an account →</a>
         </p>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}

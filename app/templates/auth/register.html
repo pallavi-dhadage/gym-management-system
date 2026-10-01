@@ -1,68 +1,91 @@
 {% extends "base.html" %}
 {% block title %}Register - GymMS{% endblock %}
 {% block content %}
+
 <div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-      <div class="card p-4">
-        <h3 class="mb-3 text-center"><i class="fas fa-user-plus"></i> Create Account</h3>
+  <div class="row justify-content-center align-items-stretch g-4">
+    <!-- Left visual -->
+    <div class="col-lg-4 d-none d-lg-block">
+      <div class="p-5 rounded-4 h-100" style="background:linear-gradient(135deg,var(--dark),var(--dark-2));color:#fff;">
+        <div class="feature-icon orange mb-3"><i class="fas fa-fire"></i></div>
+        <h2 style="color:#fff;font-weight:800;letter-spacing:-.02em;">Start strong.</h2>
+        <p style="color:rgba(255,255,255,.7);">
+          One account. All your plans, payments, and progress — in one place.
+        </p>
+
+        {% if preselected_plan %}
+          <div class="mt-4 p-3 rounded-3" style="background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.3);">
+            <div class="small text-uppercase fw-bold text-brand mb-1">Selected Plan</div>
+            <div class="fw-bold">{{ preselected_plan.name }}</div>
+            <div style="color:rgba(255,255,255,.7);" class="small">
+              ₹{{ '%.0f'|format(preselected_plan.price_rupees) }} / {{ preselected_plan.duration_days }} days
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right form -->
+    <div class="col-lg-6">
+      <div class="card p-4 p-lg-5" style="box-shadow:var(--shadow-md);">
+        <h3 class="mb-1">Create your account</h3>
+        <p class="text-muted small mb-4">It takes less than a minute.</p>
 
         <form method="POST" novalidate>
           {{ form.hidden_tag() }}
+          {% if preselected_plan %}
+            <input type="hidden" name="plan_id" value="{{ preselected_plan.id }}">
+          {% endif %}
 
           <div class="mb-3">
             {{ form.full_name.label(class="form-label") }}
-            {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else "")) }}
-            {% for e in form.full_name.errors %}
-              <div class="invalid-feedback">{{ e }}</div>
-            {% endfor %}
+            {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else ""),
+                              placeholder="John Doe") }}
+            {% for e in form.full_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
           </div>
 
-          <div class="mb-3">
-            {{ form.email.label(class="form-label") }}
-            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), autocomplete="email") }}
-            {% for e in form.email.errors %}
-              <div class="invalid-feedback">{{ e }}</div>
-            {% endfor %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              {{ form.email.label(class="form-label") }}
+              {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                            autocomplete="email", placeholder="you@example.com") }}
+              {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.phone.label(class="form-label") }}
+              {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else ""),
+                            placeholder="+91 98765 43210") }}
+              {% for e in form.phone.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
           </div>
 
-          <div class="mb-3">
-            {{ form.phone.label(class="form-label") }}
-            {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else "")) }}
-            {% for e in form.phone.errors %}
-              <div class="invalid-feedback">{{ e }}</div>
-            {% endfor %}
-          </div>
-
-          <div class="mb-3">
+          <div class="mb-3 mt-3">
             {{ form.password.label(class="form-label") }}
-            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), autocomplete="new-password") }}
-            {% for e in form.password.errors %}
-              <div class="invalid-feedback">{{ e }}</div>
-            {% endfor %}
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                             autocomplete="new-password", placeholder="••••••••") }}
+            {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
             <small class="text-muted">Minimum 8 characters, letters and numbers.</small>
           </div>
 
           <div class="mb-3">
             {{ form.confirm.label(class="form-label") }}
-            {{ form.confirm(class="form-control" + (" is-invalid" if form.confirm.errors else ""), autocomplete="new-password") }}
-            {% for e in form.confirm.errors %}
-              <div class="invalid-feedback">{{ e }}</div>
-            {% endfor %}
+            {{ form.confirm(class="form-control" + (" is-invalid" if form.confirm.errors else ""),
+                            autocomplete="new-password", placeholder="••••••••") }}
+            {% for e in form.confirm.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
           </div>
 
-          <div class="d-grid">
-            {{ form.submit(class="btn btn-brand") }}
+          <div class="d-grid mt-4">
+            {{ form.submit(class="btn btn-brand btn-lg") }}
           </div>
         </form>
 
-        <hr class="my-3">
-        <p class="text-center mb-0">
-          Already have an account?
-          <a href="{{ url_for('auth.login') }}">Login</a>
+        <hr class="my-4">
+        <p class="text-center mb-0 small">
+          Already have an account? <a href="{{ url_for('auth.login') }}" class="fw-semibold">Login →</a>
         </p>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}

@@ -1,0 +1,15 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        {% set cls = {'success':'success','danger':'danger','error':'danger','warning':'warning','info':'info','message':'info'}.get(category,'info') %}
+        {% set icon = {'success':'check-circle','danger':'exclamation-circle','error':'exclamation-circle','warning':'exclamation-triangle','info':'info-circle','message':'info-circle'}.get(category,'info-circle') %}
+        <div class="alert alert-{{ cls }} alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+          <i class="fas fa-{{ icon }}"></i>
+          <div>{{ message }}</div>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

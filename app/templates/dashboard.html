@@ -1,57 +1,188 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard - GymMS{% endblock %}
 {% block content %}
-<div class="container py-5">
-  <h1 class="mb-3">Welcome, {{ user.full_name }}</h1>
-  <p class="text-muted">Role: <span class="badge bg-secondary">{{ user.role }}</span></p>
 
+<div class="container py-5">
+
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h1 class="section-title mb-1" style="font-size:1.9rem;">
+        Welcome back, {{ user.full_name.split()[0] }}
+      </h1>
+      <p class="text-muted mb-0">
+        <span class="badge-soft {{ 'pending' if user.role == 'member' else 'active' }}">
+          <i class="fas fa-user-shield"></i> {{ user.role|title }}
+        </span>
+      </p>
+    </div>
+    <div class="text-muted small">
+      <i class="fas fa-clock me-1"></i>
+      {{ user.last_login_at.strftime('%Y-%m-%d %H:%M') if user.last_login_at else 'First login' }}
+    </div>
+  </div>
+
+  {# ============================== MEMBER ============================== #}
   {% if user.role == 'member' %}
     {% if user.membership %}
-      {% set badge = {'pending': 'warning', 'active': 'success', 'expired': 'secondary', 'cancelled': 'danger'} %}
-      <div class="card p-4 mt-3">
-        <h5>Membership</h5>
-        <p>
-          <strong>{{ user.membership.plan.name }}</strong> —
-          <span class="badge bg-{{ badge.get(user.membership.status, 'secondary') }}">
-            {{ user.membership.status }}
-          </span>
-        </p>
-        {% if user.membership.status == 'pending' %}
-          <a href="{{ url_for('member.payment') }}" class="btn btn-brand">
-            <i class="fas fa-qrcode"></i> Pay Now
-          </a>
-        {% endif %}
-        <a href="{{ url_for('member.membership') }}" class="btn btn-outline-primary ms-2">
-          View Details
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <div class="text-muted small text-uppercase fw-bold mb-1">Current Plan</div>
+                <h3 class="mb-1">{{ user.membership.plan.name }}</h3>
+                <p class="text-muted small mb-0">{{ user.membership.plan.description or '' }}</p>
+              </div>
+              <span class="badge-soft {{ user.membership.status }}">
+                {{ user.membership.status }}
+              </span>
+            </div>
+
+            <div class="row g-3 mt-2">
+              <div class="col-6 col-md-3">
+                <div class="stat-label">Price</div>
+                <div class="fw-bold">₹{{ '%.0f'|format(user.membership.plan.price_rupees) }}</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-label">Duration</div>
+                <div class="fw-bold">{{ user.membership.plan.duration_days }} days</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-label">Started</div>
+                <div class="fw-bold">
+                  {{ user.membership.started_at.strftime('%d %b') if user.membership.started_at else '—' }}
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-label">Expires</div>
+                <div class="fw-bold">
+                  {{ user.membership.expires_at.strftime('%d %b %Y') if user.membership.expires_at else '—' }}
+                </div>
+              </div>
+            </div>
+
+            {% if user.membership.status == 'active' and user.membership.expires_at %}
+              {% set days = user.membership.days_remaining() %}
+              {% if days <= 7 %}
+                <div class="alert alert-warning mt-4 mb-0 small">
+                  <i class="fas fa-hourglass-half me-1"></i>
+                  Your plan expires in <strong>{{ days }} day(s)</strong>. Renew now to avoid interruption.
+                </div>
+              {% endif %}
+            {% endif %}
+
+            <div class="mt-4 d-flex flex-wrap gap-2">
+              {% if user.membership.status == 'pending' %}
+                <a href="{{ url_for('member.payment') }}" class="btn btn-brand">
+                  <i class="fas fa-qrcode me-1"></i> Pay Now (UPI)
+                </a>
+              {% endif %}
+              <a href="{{ url_for('member.membership') }}" class="btn btn-outline-primary">
+                <i class="fas fa-info-circle me-1"></i> View Details
+              </a>
+              <a href="{{ url_for('member.plans') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-exchange-alt me-1"></i>
+                {{ 'Change Plan' if user.membership.can_change_plan() else 'View Plans' }}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card p-4 h-100">
+            <h5 class="mb-3"><i class="fas fa-bolt text-brand me-2"></i>Quick Actions</h5>
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('member.notes') }}" class="btn btn-outline-primary text-start">
+                <i class="fas fa-clipboard-list me-2"></i>My Training Notes
+              </a>
+              <a href="{{ url_for('member.payment') }}" class="btn btn-outline-secondary text-start">
+                <i class="fas fa-receipt me-2"></i>Payment History
+              </a>
+              <a href="{{ url_for('main.pricing') }}" class="btn btn-outline-secondary text-start">
+                <i class="fas fa-tags me-2"></i>Browse Plans
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-dumbbell d-block"></i>
+        <h5>You haven't picked a plan yet</h5>
+        <p>Choose a membership plan to start your fitness journey.</p>
+        <a href="{{ url_for('member.plans') }}" class="btn btn-brand mt-3">
+          <i class="fas fa-rocket me-2"></i>Choose a Plan
         </a>
       </div>
-    {% else %}
-      <div class="alert alert-info mt-3">
-        You have no active plan.
-        <a href="{{ url_for('member.plans') }}" class="alert-link">Choose one →</a>
-      </div>
     {% endif %}
+
+  {# ============================== ADMIN ============================== #}
   {% elif user.role == 'admin' %}
-    <div class="row g-3 mt-3">
+    <div class="row g-3">
       <div class="col-md-4">
         <a href="{{ url_for('admin.leads') }}" class="text-decoration-none">
-          <div class="card p-4 text-center h-100">
-            <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-            <h5>Leads</h5>
-            <p class="text-muted mb-0">Manage enquiries</p>
+          <div class="card card-hover p-4 text-center h-100">
+            <div class="feature-icon blue mx-auto"><i class="fas fa-user-plus"></i></div>
+            <h5 class="mb-1">Leads</h5>
+            <p class="text-muted small mb-0">Manage enquiries</p>
           </div>
         </a>
       </div>
       <div class="col-md-4">
         <a href="{{ url_for('admin.payments') }}" class="text-decoration-none">
-          <div class="card p-4 text-center h-100">
-            <i class="fas fa-receipt fa-3x text-success mb-3"></i>
-            <h5>Payments</h5>
-            <p class="text-muted mb-0">Verify UTRs</p>
+          <div class="card card-hover p-4 text-center h-100">
+            <div class="feature-icon green mx-auto"><i class="fas fa-receipt"></i></div>
+            <h5 class="mb-1">Payments</h5>
+            <p class="text-muted small mb-0">Verify UTRs &amp; activate</p>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <a href="{{ url_for('admin.expiring') }}" class="text-decoration-none">
+          <div class="card card-hover p-4 text-center h-100">
+            <div class="feature-icon orange mx-auto"><i class="fas fa-hourglass-end"></i></div>
+            <h5 class="mb-1">Expiring</h5>
+            <p class="text-muted small mb-0">Send renewal reminders</p>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <a href="{{ url_for('trainer.notes_list') }}" class="text-decoration-none">
+          <div class="card card-hover p-4 text-center h-100">
+            <div class="feature-icon blue mx-auto"><i class="fas fa-clipboard-list"></i></div>
+            <h5 class="mb-1">Trainer Notes</h5>
+            <p class="text-muted small mb-0">Workout &amp; diet plans</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  {# ============================== TRAINER ============================== #}
+  {% elif user.role == 'trainer' %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <a href="{{ url_for('trainer.notes_list') }}" class="text-decoration-none">
+          <div class="card card-hover p-4 text-center h-100">
+            <div class="feature-icon orange mx-auto"><i class="fas fa-clipboard-list"></i></div>
+            <h5 class="mb-1">Trainer Notes</h5>
+            <p class="text-muted small mb-0">Manage member workout &amp; diet plans</p>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a href="{{ url_for('trainer.note_create') }}" class="text-decoration-none">
+          <div class="card card-hover p-4 text-center h-100">
+            <div class="feature-icon green mx-auto"><i class="fas fa-plus-circle"></i></div>
+            <h5 class="mb-1">New Note</h5>
+            <p class="text-muted small mb-0">Add a workout or diet plan</p>
           </div>
         </a>
       </div>
     </div>
   {% endif %}
+
 </div>
+
 {% endblock %}
