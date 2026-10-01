@@ -9,6 +9,7 @@ from flask_limiter.util import get_remote_address
 from config import get_config
 from app.utils.logger import configure_logging
 from app.utils.errors import register_error_handlers
+from app.utils.security import register_security_headers
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -57,6 +58,7 @@ def create_app(config_class=None):
     app.register_blueprint(trainer_bp, url_prefix='/trainer')
 
     register_error_handlers(app)
+    register_security_headers(app)
 
     from app.cli import register_cli
     register_cli(app)

@@ -1,5 +1,4 @@
 ﻿from datetime import datetime
-from urllib.parse import urlparse
 
 from flask import (
     Blueprint, render_template, redirect, url_for,
@@ -17,6 +16,7 @@ from app.models.user import User
 from app.models.plan import Plan
 from app.models.membership import Membership
 from app.utils.logger import get_audit_logger
+from app.utils.security import is_safe_url
 
 auth_bp = Blueprint('auth', __name__)
 audit = get_audit_logger()
@@ -51,14 +51,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-def _is_safe_url(target: str) -> bool:
-    if not target:
-        return False
-    ref = urlparse(request.host_url)
-    test = urlparse(target)
-    return test.scheme in ('http', 'https') and ref.netloc == test.netloc
-
-
+# ------------------------------------------------------------------
+# Register
+# ------------------------------------------------------------------
 @auth_bp.route('/register', methods=['GET', 'POST'])
 @limiter.limit('10 per hour', methods=['POST'])
 def register():
@@ -67,7 +62,6 @@ def register():
 
     form = RegisterForm()
 
-    # Pre-select plan from query string (e.g. from pricing page)
     plan_id_raw = request.args.get('plan', type=int)
     preselected_plan = None
     if plan_id_raw:
@@ -92,7 +86,6 @@ def register():
         )
         user.set_password(form.password.data)
 
-        # Also pick up plan_id from a hidden form field (safer than only query)
         form_plan_id = request.form.get('plan_id', type=int)
         if form_plan_id:
             form_plan = db.session.get(Plan, form_plan_id)
@@ -101,7 +94,7 @@ def register():
 
         try:
             db.session.add(user)
-            db.session.flush()   # get user.id
+            db.session.flush()
 
             if preselected_plan:
                 membership = Membership(
@@ -135,6 +128,9 @@ def register():
                            preselected_plan=preselected_plan)
 
 
+# ------------------------------------------------------------------
+# Login
+# ------------------------------------------------------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit('20 per hour', methods=['POST'])
 def login():
@@ -171,13 +167,16 @@ def login():
         current_app.logger.info('User logged in: %s', user.email)
 
         next_url = request.args.get('next')
-        if next_url and _is_safe_url(next_url):
+        if next_url and is_safe_url(next_url):
             return redirect(next_url)
         return redirect(url_for('main.dashboard'))
 
     return render_template('auth/login.html', form=form)
 
 
+# ------------------------------------------------------------------
+# Logout
+# ------------------------------------------------------------------
 @auth_bp.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
