@@ -6,6 +6,13 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
 
+def _bool(name: str, default: bool = False) -> bool:
+    val = os.environ.get(name, '')
+    if not val:
+        return default
+    return val.strip().lower() in ('true', '1', 'yes', 'on')
+
+
 class Config:
     """Base configuration."""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-fallback-not-for-prod'
@@ -17,7 +24,7 @@ class Config:
         'pool_recycle': 300,
     }
 
-    SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
+    SESSION_COOKIE_SECURE = _bool('SESSION_COOKIE_SECURE', False)
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', 'Lax')
     PERMANENT_SESSION_LIFETIME = timedelta(
@@ -30,8 +37,9 @@ class Config:
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
 
-    RATELIMIT_STORAGE_URI = 'memory://'
-    RATELIMIT_DEFAULT = '200 per hour'
+    RATELIMIT_STORAGE_URI = os.environ.get('RATELIMIT_STORAGE_URI', 'memory://')
+    RATELIMIT_DEFAULT = os.environ.get('RATELIMIT_DEFAULT', '200 per hour')
+    RATELIMIT_ENABLED = _bool('RATELIMIT_ENABLED', True)
 
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOG_DIR = os.path.join(basedir, 'logs')
@@ -42,7 +50,7 @@ class Config:
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@gym.local')
     ADMIN_DEFAULT_PASSWORD = os.environ.get('ADMIN_DEFAULT_PASSWORD', 'ChangeMe@123')
 
-    SCHEDULER_ENABLED = os.environ.get('SCHEDULER_ENABLED', 'True').lower() == 'true'
+    SCHEDULER_ENABLED = _bool('SCHEDULER_ENABLED', True)
     SCHEDULER_HOUR = int(os.environ.get('SCHEDULER_HOUR', 2))
 
 
@@ -52,8 +60,16 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    TESTING = False
     SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_SECURE = True
     PREFERRED_URL_SCHEME = 'https'
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    if not SECRET_KEY:
+        raise RuntimeError(
+            'SECRET_KEY environment variable is required in production. '
+            'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
+        )
 
 
 class TestingConfig(Config):
@@ -61,6 +77,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
     SCHEDULER_ENABLED = False
+    RATELIMIT_ENABLED = False
 
 
 config = {

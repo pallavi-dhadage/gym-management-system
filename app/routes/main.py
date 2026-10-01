@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from flask import (
     Blueprint, render_template, current_app,
-    request, redirect, url_for, flash
+    request, redirect, url_for, flash, jsonify
 )
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
@@ -37,6 +39,13 @@ def _active_plans():
     )
 
 
+def _client_ip():
+    xff = request.headers.get('X-Forwarded-For', '')
+    if xff:
+        return xff.split(',')[0].strip()
+    return request.remote_addr or 'unknown'
+
+
 @main_bp.route('/')
 def index():
     current_app.logger.info('Landing page visited')
@@ -56,7 +65,7 @@ def enquiry():
     if form.validate_on_submit():
         if form.website.data:
             audit.warning('ENQUIRY_HONEYPOT email=%s ip=%s',
-                          form.email.data, request.remote_addr)
+                          form.email.data, _client_ip())
             flash('Thanks! We will reach out shortly.', 'success')
             return redirect(url_for('main.index'))
 
@@ -66,7 +75,7 @@ def enquiry():
             phone=form.phone.data.strip(),
             message=(form.message.data or '').strip(),
             source='landing_page',
-            ip_address=request.remote_addr,
+            ip_address=_client_ip(),
             user_agent=(request.user_agent.string or '')[:255],
         )
 
@@ -80,7 +89,7 @@ def enquiry():
             return render_template('index.html', form=form, plans=_active_plans()), 500
 
         audit.info('LEAD_CREATED lead_id=%s email=%s ip=%s',
-                   lead.id, lead.email, request.remote_addr)
+                   lead.id, lead.email, _client_ip())
         flash('Thanks! We will reach out shortly.', 'success')
         return redirect(url_for('main.index'))
 
@@ -94,3 +103,9 @@ def enquiry():
 @login_required
 def dashboard():
     return render_template('dashboard.html', user=current_user)
+
+
+@main_bp.route('/healthz')
+def healthz():
+    """Lightweight liveness check for load balancers / monitoring."""
+    return jsonify(status='ok', service='gymms'), 200

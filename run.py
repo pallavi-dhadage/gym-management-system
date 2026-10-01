@@ -12,5 +12,9 @@ def make_shell_context():
 if __name__ == '__main__':
     host = os.environ.get('HOST', '127.0.0.1')
     port = int(os.environ.get('PORT', 5000))
-    app.logger.info('Starting dev server on %s:%s', host, port)
-    app.run(host=host, port=port, debug=True)
+
+    # Debug only when explicitly in development
+    debug = app.config.get('DEBUG', False)
+
+    app.logger.info('Starting dev server on %s:%s (debug=%s)', host, port, debug)
+    app.run(host=host, port=port, debug=debug)
