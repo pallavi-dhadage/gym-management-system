@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}GymMS — Transform Your Body{% endblock %}
+{% block title %}SetFit Gym — Transform Your Body{% endblock %}
 
 {% block content %}
 
@@ -7,15 +7,15 @@
 <section class="hero">
   <div class="container position-relative text-center">
     <span class="badge-soft mb-3" style="background:rgba(255,107,53,0.15);color:var(--brand);">
-      <i class="fas fa-star"></i> Trusted by fitness enthusiasts
+      <i class="fas fa-star"></i> Premium Fitness Community
     </span>
     <h1 class="mb-3">
-      Transform Your Body.<br>
-      <span class="accent">Simplify Your Gym.</span>
+      Elevate Your Fitness.<br>
+      <span class="accent">Join SetFit Gym.</span>
     </h1>
     <p class="lead mb-4">
-      Memberships, UPI payments, personalized training notes, and automatic renewals —
-      all in one modern platform.
+      State-of-the-art facilities, trekking adventures, cricket tournaments, and personalized training —
+      all managed through our modern platform.
     </p>
     <div class="d-flex flex-wrap justify-content-center gap-3">
       <a href="#pricing" class="btn btn-brand btn-lg px-4">
@@ -47,9 +47,9 @@
 <section id="features" class="section">
   <div class="container">
     <div class="text-center">
-      <h2 class="section-title">Everything you need to succeed</h2>
+      <h2 class="section-title">Beyond the Gym Walls</h2>
       <p class="section-subtitle">
-        Built for members, trainers, and gym owners — a single platform for the whole journey.
+        From indoor training to outdoor adventures — a complete fitness ecosystem for your journey.
       </p>
     </div>
 
@@ -82,6 +82,48 @@
         </div>
       </div>
     </div>
+
+    <!-- Activity Highlights -->
+    <div class="text-center mt-5 pt-4">
+      <h3 class="h4 mb-4">Community Activities & Adventures</h3>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card card-hover p-4 h-100" style="border-color:#10b981;">
+          <div class="feature-icon" style="background:rgba(16,185,129,0.12);color:#10b981;">
+            <i class="fas fa-mountain"></i>
+          </div>
+          <h5 class="mb-2">Weekend Trekking</h5>
+          <p class="text-muted mb-0">
+            Join our guided trekking adventures in scenic locations. Build endurance,
+            connect with nature, and bond with fellow fitness enthusiasts.
+          </p>
+          <div class="mt-3">
+            <span class="badge-soft" style="background:rgba(16,185,129,0.12);color:#10b981;">
+              <i class="fas fa-calendar-alt me-1"></i>Every Saturday
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card card-hover p-4 h-100" style="border-color:#3b82f6;">
+          <div class="feature-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+            <i class="fas fa-baseball-ball"></i>
+          </div>
+          <h5 class="mb-2">Cricket Tournaments</h5>
+          <p class="text-muted mb-0">
+            Competitive cricket leagues and friendly matches. Perfect for building
+            teamwork, agility, and cardiovascular fitness in a fun environment.
+          </p>
+          <div class="mt-3">
+            <span class="badge-soft" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+              <i class="fas fa-trophy me-1"></i>Monthly Tournaments
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -89,9 +131,9 @@
 <section id="pricing" class="section" style="background:var(--surface);">
   <div class="container">
     <div class="text-center">
-      <h2 class="section-title">Simple, transparent pricing</h2>
+      <h2 class="section-title">Premium Membership Plans</h2>
       <p class="section-subtitle">
-        Pick a plan. Pay via UPI. Start training the same day.
+        Access gym facilities, trekking adventures, cricket tournaments, and personalized training.
       </p>
     </div>
 
@@ -114,6 +156,8 @@
               <li><i class="fas fa-check-circle text-brand me-2"></i>Full gym access</li>
               <li><i class="fas fa-check-circle text-brand me-2"></i>Mobile app access</li>
               <li><i class="fas fa-check-circle text-brand me-2"></i>Locker included</li>
+              <li><i class="fas fa-check-circle text-brand me-2"></i>Trekking adventures</li>
+              <li><i class="fas fa-check-circle text-brand me-2"></i>Cricket tournaments</li>
               {% if loop.index >= 2 %}
                 <li><i class="fas fa-check-circle text-brand me-2"></i>Personal training sessions</li>
               {% endif %}

@@ -1,6 +1,6 @@
-# GymMS — Security Overview
+# SetFit Gym — Security Overview
 
-This document lists the security controls implemented in the GymMS Flask application.
+This document lists the security controls implemented in the SetFit Gym Flask application.
 
 ## Threat Model
 
@@ -85,7 +85,7 @@ Trust boundaries:
 
 ## Responsible Disclosure
 
-Report vulnerabilities to: **security@gymms.local**
+Report vulnerabilities to: **security@setfitgym.com**
 
 Please include:
 - Affected endpoint / version

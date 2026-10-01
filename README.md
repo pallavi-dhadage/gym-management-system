@@ -1,6 +1,6 @@
-# GymMS — Gym Management System
+# SetFit Gym — Premium Gym Management System
 
-A production-ready Flask application for managing gym memberships, UPI payments, personalized training notes, and automated renewal reminders.
+A production-ready Flask application for managing SetFit Gym memberships, UPI payments, personalized training notes, trekking adventures, cricket tournaments, and automated renewal reminders.
 
 ## Features
 

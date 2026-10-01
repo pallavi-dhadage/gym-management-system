@@ -108,4 +108,4 @@ def dashboard():
 @main_bp.route('/healthz')
 def healthz():
     """Lightweight liveness check for load balancers / monitoring."""
-    return jsonify(status='ok', service='gymms'), 200
+    return jsonify(status='ok', service='setfitgym'), 200
