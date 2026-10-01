@@ -38,7 +38,8 @@ def _login_admin(client):
 def test_enquiry_form_renders_on_landing(app, client):
     resp = client.get('/')
     assert resp.status_code == 200
-    assert b'Free Trial Enquiry' in resp.data
+    assert b'Free Trial' in resp.data
+    assert b'action="/enquiry"' in resp.data
 
 
 def test_enquiry_valid_creates_lead(app, client):
