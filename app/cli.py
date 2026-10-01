@@ -12,16 +12,12 @@ from app.utils.logger import get_audit_logger
 @click.option('--email', prompt=True, help='Admin email')
 @click.option('--full-name', prompt='Full name', help='Admin full name')
 @click.option('--phone', prompt=True, help='Admin phone')
-@click.option(
-    '--password',
-    prompt=True, hide_input=True, confirmation_prompt=True,
-    help='Admin password (min 8 chars, letters + numbers)'
-)
+@click.option('--password', prompt=True, hide_input=True,
+              confirmation_prompt=True, help='Admin password')
 @with_appcontext
 def create_admin_command(email, full_name, phone, password):
     """Create an admin user from the command line."""
     audit = get_audit_logger()
-
     email = email.strip().lower()
     if len(password) < 8 or not any(c.isalpha() for c in password) \
             or not any(c.isdigit() for c in password):
@@ -42,7 +38,6 @@ def create_admin_command(email, full_name, phone, password):
     user = User(email=email, full_name=full_name.strip(),
                 phone=phone.strip(), role='admin')
     user.set_password(password)
-
     try:
         db.session.add(user)
         db.session.commit()
@@ -60,16 +55,12 @@ def create_admin_command(email, full_name, phone, password):
 @click.option('--email', prompt=True, help='Trainer email')
 @click.option('--full-name', prompt='Full name', help='Trainer full name')
 @click.option('--phone', prompt=True, help='Trainer phone')
-@click.option(
-    '--password',
-    prompt=True, hide_input=True, confirmation_prompt=True,
-    help='Trainer password (min 8 chars, letters + numbers)'
-)
+@click.option('--password', prompt=True, hide_input=True,
+              confirmation_prompt=True, help='Trainer password')
 @with_appcontext
 def create_trainer_command(email, full_name, phone, password):
     """Create a trainer user from the command line."""
     audit = get_audit_logger()
-
     email = email.strip().lower()
     if len(password) < 8 or not any(c.isalpha() for c in password) \
             or not any(c.isdigit() for c in password):
@@ -83,7 +74,6 @@ def create_trainer_command(email, full_name, phone, password):
     user = User(email=email, full_name=full_name.strip(),
                 phone=phone.strip(), role='trainer')
     user.set_password(password)
-
     try:
         db.session.add(user)
         db.session.commit()
@@ -145,8 +135,23 @@ def seed_plans_command():
     click.echo(f'Seeded {created} plan(s). Total plans: {Plan.query.count()}')
 
 
+@click.command('run-expiry-check')
+@with_appcontext
+def run_expiry_check_command():
+    """Run the daily expiry + reminder job once (manual trigger)."""
+    from app.services.scheduler import expire_memberships
+    summary = expire_memberships(current_app)
+    click.echo(
+        f"Done. expired={summary['expired']} "
+        f"notices={summary['notices_sent']} "
+        f"reminders={summary['reminders_sent']} "
+        f"skipped={summary['skipped']}"
+    )
+
+
 def register_cli(app):
     app.cli.add_command(create_admin_command)
     app.cli.add_command(create_trainer_command)
     app.cli.add_command(list_users_command)
     app.cli.add_command(seed_plans_command)
+    app.cli.add_command(run_expiry_check_command)

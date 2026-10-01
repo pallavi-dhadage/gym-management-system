@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import (
     Blueprint, render_template, redirect, url_for,
@@ -13,6 +13,8 @@ from app import db
 from app.models.lead import Lead
 from app.models.payment import Payment
 from app.models.membership import Membership
+from app.models.reminder import Reminder
+from app.services.notifications import send_renewal_reminder
 from app.utils.decorators import role_required
 from app.utils.logger import get_audit_logger
 
@@ -20,9 +22,6 @@ admin_bp = Blueprint('admin', __name__)
 audit = get_audit_logger()
 
 
-# ------------------------------------------------------------------
-# Forms
-# ------------------------------------------------------------------
 class LeadUpdateForm(FlaskForm):
     status = SelectField(
         'Status',
@@ -39,9 +38,6 @@ class PaymentDecisionForm(FlaskForm):
     reject = SubmitField('Reject')
 
 
-# ------------------------------------------------------------------
-# Leads
-# ------------------------------------------------------------------
 @admin_bp.route('/leads')
 @login_required
 @role_required('admin')
@@ -92,9 +88,6 @@ def lead_detail(lead_id: int):
     return render_template('admin/lead_detail.html', lead=lead, form=form)
 
 
-# ------------------------------------------------------------------
-# Payments queue
-# ------------------------------------------------------------------
 @admin_bp.route('/payments')
 @login_required
 @role_required('admin')
@@ -193,3 +186,65 @@ def payment_reject(payment_id: int):
                current_user.email)
     flash('Payment rejected. Member can resubmit.', 'info')
     return redirect(url_for('admin.payments'))
+
+
+# ------------------------------------------------------------------
+# Expiring memberships / reminders
+# ------------------------------------------------------------------
+@admin_bp.route('/expiring')
+@login_required
+@role_required('admin')
+def expiring():
+    now = datetime.utcnow()
+    window_days = int(current_app.config.get('MEMBERSHIP_REMINDER_DAYS', 7))
+    horizon = now + timedelta(days=window_days)
+
+    expiring = (
+        Membership.query
+        .filter(Membership.status == 'active')
+        .filter(Membership.expires_at.isnot(None))
+        .filter(Membership.expires_at <= horizon)
+        .order_by(Membership.expires_at.asc())
+        .all()
+    )
+
+    latest_reminders = {}
+    for m in expiring:
+        r = (
+            Reminder.query
+            .filter_by(membership_id=m.id, kind='renewal_reminder')
+            .order_by(Reminder.sent_at.desc())
+            .first()
+        )
+        if r:
+            latest_reminders[m.id] = r
+
+    return render_template(
+        'admin/expiring.html',
+        memberships=expiring,
+        latest_reminders=latest_reminders,
+        window_days=window_days,
+        now=now,
+    )
+
+
+@admin_bp.route('/expiring/notify/<int:membership_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def expiring_notify(membership_id: int):
+    m = db.session.get(Membership, membership_id)
+    if m is None:
+        abort(404)
+    if m.status != 'active':
+        flash('Only active memberships can receive a reminder.', 'warning')
+        return redirect(url_for('admin.expiring'))
+
+    try:
+        send_renewal_reminder(m)
+    except Exception:
+        current_app.logger.exception('MANUAL_REMINDER_FAILED membership_id=%s', m.id)
+        flash('Could not send reminder.', 'danger')
+        return redirect(url_for('admin.expiring'))
+
+    flash(f'Reminder sent to {m.user.full_name}.', 'success')
+    return redirect(url_for('admin.expiring'))

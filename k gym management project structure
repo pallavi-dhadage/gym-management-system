@@ -1,0 +1,8 @@
+[33maa572e9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m feat: complete trainer notes module (routes, templates, tests)
+[33mcfa06a0[m[33m ([m[1;31morigin/main[m[33m)[m feat: add trainer notes module with member visibility
+[33m1b9225a[m fix: add User.membership relationship and Membership.user backref
+[33m11cbb1a[m feat: add membership plans and pending enrollment flow
+[33mcf298c8[m feat: add lead enquiry module with admin management
+[33mff0c97f[m feat: add admin bootstrap CLI and automated auth tests
+[33m0cd25c3[m feat: add secure authentication with RBAC, hashing, audit logs
+[33m0235005[m feat: initialize flask gym management project structure

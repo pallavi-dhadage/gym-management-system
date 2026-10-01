@@ -58,7 +58,6 @@ def create_app(config_class=None):
 
     register_error_handlers(app)
 
-    # CLI commands
     from app.cli import register_cli
     register_cli(app)
 
@@ -66,6 +65,10 @@ def create_app(config_class=None):
     def inject_globals():
         from datetime import datetime
         return {'now_year': datetime.utcnow().year}
+
+    if not app.config.get('TESTING'):
+        from app.services.scheduler import start_scheduler
+        start_scheduler(app)
 
     app.logger.info('Application factory completed. Env=%s', app.config.get('ENV', 'development'))
     return app

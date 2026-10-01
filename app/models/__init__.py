@@ -4,5 +4,6 @@ from app.models.plan import Plan
 from app.models.membership import Membership
 from app.models.payment import Payment
 from app.models.note import TrainerNote
+from app.models.reminder import Reminder
 
-__all__ = ['User', 'Lead', 'Plan', 'Membership', 'Payment', 'TrainerNote']
+__all__ = ['User', 'Lead', 'Plan', 'Membership', 'Payment', 'TrainerNote', 'Reminder']

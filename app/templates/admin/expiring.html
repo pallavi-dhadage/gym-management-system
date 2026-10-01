@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Expiring Memberships - Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="fas fa-hourglass-end"></i> Expiring Memberships</h2>
+    <span class="text-muted small">Next {{ window_days }} days</span>
+  </div>
+
+  {% if memberships %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle bg-white">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Member</th>
+            <th>Plan</th>
+            <th>Expires</th>
+            <th>Days Left</th>
+            <th>Last Reminder</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in memberships %}
+            <tr>
+              <td>{{ m.id }}</td>
+              <td>
+                {{ m.user.full_name }}<br>
+                <small class="text-muted">{{ m.user.email }}</small>
+              </td>
+              <td>{{ m.plan.name }}</td>
+              <td>{{ m.expires_at.strftime('%Y-%m-%d') }}</td>
+              <td>
+                {% set d = m.days_remaining() %}
+                <span class="badge bg-{{ 'danger' if d <= 2 else ('warning' if d <= 5 else 'secondary') }}">
+                  {{ d }} day(s)
+                </span>
+              </td>
+              <td>
+                {% set r = latest_reminders.get(m.id) %}
+                {% if r %}
+                  <small class="text-muted">{{ r.sent_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                {% else %}
+                  <small class="text-muted">—</small>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <form method="POST" action="{{ url_for('admin.expiring_notify', membership_id=m.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-sm btn-brand">
+                    <i class="fas fa-bell"></i> Send Reminder
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i>
+      No memberships expiring in the next {{ window_days }} days.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

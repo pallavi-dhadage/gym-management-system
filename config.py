@@ -17,7 +17,6 @@ class Config:
         'pool_recycle': 300,
     }
 
-    # Session security
     SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', 'Lax')
@@ -28,24 +27,23 @@ class Config:
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_SAMESITE = 'Lax'
 
-    # CSRF
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
 
-    # Rate limiting
     RATELIMIT_STORAGE_URI = 'memory://'
     RATELIMIT_DEFAULT = '200 per hour'
 
-    # Logging
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOG_DIR = os.path.join(basedir, 'logs')
 
-    # Business
     UPI_ID = os.environ.get('UPI_ID', 'gym@upi')
     UPI_PAYEE_NAME = os.environ.get('UPI_PAYEE_NAME', 'Gym Management')
     MEMBERSHIP_REMINDER_DAYS = int(os.environ.get('MEMBERSHIP_REMINDER_DAYS', 7))
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@gym.local')
     ADMIN_DEFAULT_PASSWORD = os.environ.get('ADMIN_DEFAULT_PASSWORD', 'ChangeMe@123')
+
+    SCHEDULER_ENABLED = os.environ.get('SCHEDULER_ENABLED', 'True').lower() == 'true'
+    SCHEDULER_HOUR = int(os.environ.get('SCHEDULER_HOUR', 2))
 
 
 class DevelopmentConfig(Config):
@@ -62,6 +60,7 @@ class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
+    SCHEDULER_ENABLED = False
 
 
 config = {
