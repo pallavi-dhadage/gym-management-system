@@ -5,8 +5,10 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="section-title mb-1" style="font-size:1.8rem;">My Membership</h1>
-      <p class="text-muted mb-0">Your plan, status, and payment history.</p>
+      <h1 class="section-title mb-1" style="font-size:1.8rem;">
+        <i class="fas fa-id-card text-brand me-2"></i>My Membership
+      </h1>
+      <p class="text-muted mb-0">Your fitness journey progress and membership details.</p>
     </div>
     {% if membership %}
       <a href="{{ url_for('member.plans') }}" class="btn btn-outline-primary">
@@ -26,6 +28,88 @@
       </a>
     </div>
   {% else %}
+
+    <!-- Visual Journey Map -->
+    <div class="journey-map-container mb-4">
+      <div class="card journey-map p-4">
+        <h6 class="text-uppercase small text-muted fw-bold mb-4 text-center">Your Fitness Journey</h6>
+        <div class="journey-steps">
+          <div class="journey-step {{ 'active' if membership else '' }} completed">
+            <div class="journey-step-icon">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="journey-step-label">Plan Selected</div>
+            <div class="journey-step-connector"></div>
+          </div>
+          
+          <div class="journey-step {{ 'active' if membership.status in ['pending', 'active'] else '' }} {{ 'completed' if payments else '' }}">
+            <div class="journey-step-icon">
+              {% if payments %}
+                <i class="fas fa-check"></i>
+              {% else %}
+                <i class="fas fa-qrcode"></i>
+              {% endif %}
+            </div>
+            <div class="journey-step-label">Payment</div>
+            <div class="journey-step-connector"></div>
+          </div>
+          
+          <div class="journey-step {{ 'active' if membership.status == 'active' else '' }} {{ 'completed' if membership.status == 'active' else '' }}">
+            <div class="journey-step-icon">
+              {% if membership.status == 'active' %}
+                <i class="fas fa-check"></i>
+              {% else %}
+                <i class="fas fa-hourglass-half"></i>
+              {% endif %}
+            </div>
+            <div class="journey-step-label">Verification</div>
+            <div class="journey-step-connector"></div>
+          </div>
+          
+          <div class="journey-step {{ 'active' if membership.status == 'active' else '' }} {{ 'completed' if membership.status == 'active' else '' }}">
+            <div class="journey-step-icon">
+              {% if membership.status == 'active' %}
+                <i class="fas fa-check"></i>
+              {% else %}
+                <i class="fas fa-dumbbell"></i>
+              {% endif %}
+            </div>
+            <div class="journey-step-label">Active Training</div>
+            <div class="journey-step-connector"></div>
+          </div>
+          
+          <div class="journey-step {{ 'pulse-animation' if membership.status == 'active' and membership.days_remaining() <= 7 else '' }}">
+            <div class="journey-step-icon">
+              <i class="fas fa-redo-alt"></i>
+            </div>
+            <div class="journey-step-label">Renewal</div>
+          </div>
+        </div>
+        
+        <!-- Current Status Message -->
+        <div class="text-center mt-4">
+          {% if membership.status == 'pending' %}
+            <p class="mb-0 small">
+              <i class="fas fa-info-circle text-brand me-1"></i>
+              <strong>Next Step:</strong> Complete payment and submit UTR reference to activate your membership
+            </p>
+          {% elif membership.status == 'active' %}
+            {% set days = membership.days_remaining() %}
+            {% if days <= 7 %}
+              <p class="mb-0 small text-warning">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                <strong>Action Needed:</strong> Your membership expires in {{ days }} day(s) - Renew now!
+              </p>
+            {% else %}
+              <p class="mb-0 small text-success">
+                <i class="fas fa-check-circle me-1"></i>
+                <strong>All Set!</strong> Your membership is active with {{ days }} days remaining
+              </p>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
 
     <div class="row g-4">
       <!-- Plan card -->

@@ -2186,3 +2186,300 @@ img {
 .empty-state {
   animation: fadeInUp 0.8s ease;
 }
+
+
+/* =========================================================
+   JOURNEY MAP & FLOW VISUALIZATION
+   ========================================================= */
+
+/* Journey Map Container */
+.journey-map {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(255,107,53,0.03) 100%);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+/* Journey Steps */
+.journey-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.journey-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  z-index: 2;
+}
+
+.journey-step-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--muted);
+  transition: all var(--t);
+  position: relative;
+  z-index: 3;
+}
+
+.journey-step.active .journey-step-icon {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-soft);
+}
+
+.journey-step.completed .journey-step-icon {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+}
+
+.journey-step-label {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+  transition: color var(--t);
+}
+
+.journey-step.active .journey-step-label,
+.journey-step.completed .journey-step-label {
+  color: var(--text);
+}
+
+/* Journey Connector Line */
+.journey-step-connector {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background: var(--border);
+  z-index: 1;
+  transition: background var(--t);
+}
+
+.journey-step:last-child .journey-step-connector {
+  display: none;
+}
+
+.journey-step.completed .journey-step-connector {
+  background: var(--brand);
+}
+
+.journey-step.active .journey-step-connector {
+  background: linear-gradient(90deg, var(--brand) 0%, var(--border) 100%);
+}
+
+/* Animated Progress on Connector */
+.journey-step.active .journey-step-connector::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: var(--brand);
+  animation: progressLine 2s ease-in-out infinite;
+}
+
+@keyframes progressLine {
+  0%, 100% {
+    width: 0%;
+    opacity: 1;
+  }
+  50% {
+    width: 100%;
+    opacity: 0.5;
+  }
+}
+
+/* Pulsing Effect for Urgent Steps */
+.journey-step.pulse-animation .journey-step-icon {
+  animation: pulsing 2s ease-in-out infinite;
+}
+
+@keyframes pulsing {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(255, 107, 53, 0);
+  }
+}
+
+/* Mobile Journey Map */
+@media (max-width: 767.98px) {
+  .journey-steps {
+    flex-direction: column;
+    padding: 0;
+  }
+  
+  .journey-step {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+    margin-bottom: 1.5rem;
+  }
+  
+  .journey-step:last-child {
+    margin-bottom: 0;
+  }
+  
+  .journey-step-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .journey-step-label {
+    margin-top: 0;
+    margin-left: 1rem;
+    text-align: left;
+    flex: 1;
+  }
+  
+  .journey-step-connector {
+    display: none !important;
+  }
+  
+  /* Vertical connector line */
+  .journey-step::after {
+    content: '';
+    position: absolute;
+    left: 25px;
+    top: 60px;
+    width: 3px;
+    height: calc(100% + 1rem);
+    background: var(--border);
+  }
+  
+  .journey-step.completed::after {
+    background: var(--brand);
+  }
+  
+  .journey-step:last-child::after {
+    display: none;
+  }
+}
+
+/* Status Badge Enhancements */
+.badge-soft {
+  transition: all var(--t);
+}
+
+.badge-soft.pending {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Timeline Enhancement */
+.status-timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.status-timeline::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-icon {
+  position: absolute;
+  left: -2rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  z-index: 2;
+}
+
+.timeline-item.completed .timeline-icon {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.timeline-item.active .timeline-icon {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Progress Indicator */
+.progress-indicator {
+  position: relative;
+  height: 6px;
+  background: var(--bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-indicator-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand) 0%, #e85a2a 100%);
+  border-radius: 10px;
+  transition: width 1s ease;
+  position: relative;
+}
+
+.progress-indicator-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

@@ -998,3 +998,128 @@ document.addEventListener('DOMContentLoaded', () => {
         initDashboardInteractions();
     }
 });
+
+
+// =========================================================
+// JOURNEY MAP & FLOW VISUALIZATION ANIMATIONS
+// =========================================================
+
+function initJourneyMap() {
+    const journeyMap = document.querySelector('.journey-map');
+    if (!journeyMap) return;
+    
+    // Animate journey map entrance
+    gsap.from('.journey-map', {
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power2.out'
+    });
+    
+    // Animate journey steps with stagger
+    const journeySteps = document.querySelectorAll('.journey-step');
+    gsap.from(journeySteps, {
+        duration: 0.6,
+        scale: 0,
+        opacity: 0,
+        ease: 'back.out(1.7)',
+        stagger: 0.15,
+        delay: 0.3
+    });
+    
+    // Animate connectors
+    gsap.from('.journey-step-connector', {
+        duration: 0.8,
+        scaleX: 0,
+        transformOrigin: 'left',
+        ease: 'power2.out',
+        stagger: 0.15,
+        delay: 0.6
+    });
+    
+    // Add hover effect to journey steps
+    journeySteps.forEach(step => {
+        step.addEventListener('mouseenter', () => {
+            const icon = step.querySelector('.journey-step-icon');
+            if (icon) {
+                gsap.to(icon, {
+                    duration: 0.3,
+                    scale: 1.15,
+                    rotation: 5,
+                    ease: 'back.out(1.7)'
+                });
+            }
+        });
+        
+        step.addEventListener('mouseleave', () => {
+            const icon = step.querySelector('.journey-step-icon');
+            if (icon) {
+                gsap.to(icon, {
+                    duration: 0.3,
+                    scale: 1,
+                    rotation: 0,
+                    ease: 'power2.out'
+                });
+            }
+        });
+    });
+    
+    // Animate current status message
+    gsap.from('.journey-map .text-center.mt-4', {
+        duration: 0.6,
+        y: 20,
+        opacity: 0,
+        ease: 'power2.out',
+        delay: 1.2
+    });
+}
+
+// Timeline animations
+function initTimeline() {
+    const timeline = document.querySelector('.status-timeline');
+    if (!timeline) return;
+    
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    
+    gsap.from(timelineItems, {
+        scrollTrigger: {
+            trigger: timeline,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 0.6,
+        x: -20,
+        opacity: 0,
+        ease: 'power2.out',
+        stagger: 0.15
+    });
+}
+
+// Progress indicator animation
+function initProgressIndicators() {
+    const progressIndicators = document.querySelectorAll('.progress-indicator-fill');
+    
+    progressIndicators.forEach(indicator => {
+        const targetWidth = indicator.style.width || '0%';
+        
+        gsap.from(indicator, {
+            scrollTrigger: {
+                trigger: indicator,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'
+            },
+            duration: 1.5,
+            width: '0%',
+            ease: 'power2.out'
+        });
+    });
+}
+
+// Initialize on membership page
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname.includes('/membership')) {
+        initJourneyMap();
+        initTimeline();
+        initProgressIndicators();
+    }
+});
