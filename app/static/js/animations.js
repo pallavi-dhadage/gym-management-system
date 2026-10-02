@@ -692,3 +692,92 @@ function initHeroSlider() {
 document.addEventListener('DOMContentLoaded', () => {
     initHeroSlider();
 });
+
+
+// =========================================================
+// LANDING PAGE ENHANCEMENTS ANIMATIONS
+// =========================================================
+
+// Trust indicators animation
+function initTrustIndicators() {
+    const trustSection = document.querySelector('.trust-section');
+    if (!trustSection) return;
+    
+    gsap.from('.trust-item', {
+        scrollTrigger: {
+            trigger: '.trust-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 0.6,
+        y: 30,
+        opacity: 0,
+        ease: 'back.out(1.7)',
+        stagger: 0.1
+    });
+}
+
+// Testimonials animation
+function initTestimonials() {
+    const testimonialsSection = document.querySelector('.testimonials-section');
+    if (!testimonialsSection) return;
+    
+    // Animate section title
+    gsap.from('.testimonials-section .section-title', {
+        scrollTrigger: {
+            trigger: '.testimonials-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power3.out'
+    });
+    
+    // Animate testimonial cards
+    gsap.from('.testimonial-card', {
+        scrollTrigger: {
+            trigger: '.testimonials-section',
+            start: 'top 70%',
+            toggleActions: 'play none none reverse'
+        },
+        duration: 0.7,
+        y: 40,
+        opacity: 0,
+        ease: 'power2.out',
+        stagger: 0.15
+    });
+    
+    // Add hover effect for testimonial cards
+    const testimonialCards = document.querySelectorAll('.testimonial-card');
+    testimonialCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            if (window.innerWidth > 768) {
+                gsap.to(card, {
+                    duration: 0.3,
+                    y: -8,
+                    boxShadow: '0 20px 40px rgba(15, 22, 33, 0.15)',
+                    ease: 'power2.out'
+                });
+            }
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            if (window.innerWidth > 768) {
+                gsap.to(card, {
+                    duration: 0.3,
+                    y: 0,
+                    boxShadow: 'var(--shadow-sm)',
+                    ease: 'power2.out'
+                });
+            }
+        });
+    });
+}
+
+// Initialize new animations on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+    initTrustIndicators();
+    initTestimonials();
+});

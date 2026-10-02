@@ -1622,3 +1622,237 @@ img {
 .hero-slider {
   contain: layout style paint;
 }
+
+
+/* =========================================================
+   LANDING PAGE ENHANCEMENTS
+   ========================================================= */
+
+/* Trust indicators section */
+.trust-section {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.trust-item {
+  padding: 1rem;
+  transition: transform var(--t);
+}
+
+.trust-item:hover {
+  transform: translateY(-3px);
+}
+
+.trust-item .fw-600 {
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 0.5rem;
+}
+
+/* Testimonials section */
+.testimonials-section {
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+}
+
+.testimonial-card {
+  transition: all var(--t);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonial-card::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: 15px;
+  font-size: 5rem;
+  color: var(--brand);
+  opacity: 0.1;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand);
+}
+
+.testimonial-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand) 0%, #e85a2a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.testimonial-rating {
+  font-size: 0.9rem;
+}
+
+.testimonial-rating i {
+  margin-right: 2px;
+}
+
+/* CTA section improvements */
+.cta-section {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--dark-2) 100%);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 30% 50%, rgba(255, 107, 53, 0.15), transparent 50%),
+              radial-gradient(circle at 70% 50%, rgba(59, 130, 246, 0.12), transparent 50%);
+  pointer-events: none;
+}
+
+.cta-highlight {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--r-lg);
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.cta-benefit {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+}
+
+.cta-benefit-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Stats enhancement */
+.stat-value {
+  position: relative;
+  display: inline-block;
+}
+
+.stat-value::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: var(--brand);
+  border-radius: 2px;
+}
+
+/* Mobile optimizations for new sections */
+@media (max-width: 767.98px) {
+  .trust-section {
+    padding: 30px 0 !important;
+  }
+  
+  .trust-item {
+    padding: 0.75rem;
+  }
+  
+  .trust-item .fs-2 {
+    font-size: 1.5rem !important;
+  }
+  
+  .testimonial-card {
+    margin-bottom: 1rem;
+  }
+  
+  .testimonial-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+  
+  .cta-highlight {
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .cta-benefit {
+    padding: 0.5rem 0;
+  }
+  
+  .cta-benefit-icon {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* Animation enhancements for landing page */
+.trust-item {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.trust-item:nth-child(1) { animation-delay: 0.1s; }
+.trust-item:nth-child(2) { animation-delay: 0.2s; }
+.trust-item:nth-child(3) { animation-delay: 0.3s; }
+.trust-item:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Testimonial card entrance animation */
+.testimonial-card {
+  animation: slideInUp 0.8s ease forwards;
+  opacity: 0;
+}
+
+.testimonial-card:nth-child(1) { animation-delay: 0.2s; }
+.testimonial-card:nth-child(2) { animation-delay: 0.4s; }
+.testimonial-card:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reduce motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  .trust-item,
+  .testimonial-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
