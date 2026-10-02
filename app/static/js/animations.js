@@ -571,3 +571,124 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 console.log('SetFit Gym animations loaded successfully!');
+
+
+// =========================================================
+// HERO BACKGROUND SLIDER ENHANCEMENT
+// =========================================================
+
+function initHeroSlider() {
+    const heroSlider = document.querySelector('.hero-slider');
+    if (!heroSlider) return;
+    
+    const slides = heroSlider.querySelectorAll('.hero-slide');
+    if (slides.length === 0) return;
+    
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+        // Show only first slide for reduced motion
+        slides.forEach((slide, index) => {
+            slide.style.opacity = index === 0 ? '1' : '0';
+        });
+        return;
+    }
+    
+    let currentSlide = 0;
+    const slideCount = slides.length;
+    const slideDuration = 8000; // 8 seconds per slide
+    
+    // Enhanced slide transition with GSAP
+    function transitionToSlide(index) {
+        const prevSlide = currentSlide;
+        currentSlide = index;
+        
+        // Fade out previous slide
+        gsap.to(slides[prevSlide], {
+            duration: 1.5,
+            opacity: 0,
+            ease: 'power2.inOut'
+        });
+        
+        // Fade in and zoom current slide
+        gsap.fromTo(slides[currentSlide],
+            {
+                opacity: 0,
+                scale: 1
+            },
+            {
+                duration: 1.5,
+                opacity: 1,
+                scale: 1.1,
+                ease: 'power2.inOut'
+            }
+        );
+        
+        // Add subtle pan effect
+        gsap.to(slides[currentSlide], {
+            duration: slideDuration / 1000,
+            x: '-5%',
+            ease: 'sine.inOut',
+            repeat: 1,
+            yoyo: true
+        });
+    }
+    
+    // Auto-advance slides
+    let sliderInterval = setInterval(() => {
+        const nextSlide = (currentSlide + 1) % slideCount;
+        transitionToSlide(nextSlide);
+    }, slideDuration);
+    
+    // Pause slider on hover (desktop only)
+    if (window.innerWidth > 768) {
+        heroSlider.addEventListener('mouseenter', () => {
+            clearInterval(sliderInterval);
+        });
+        
+        heroSlider.addEventListener('mouseleave', () => {
+            sliderInterval = setInterval(() => {
+                const nextSlide = (currentSlide + 1) % slideCount;
+                transitionToSlide(nextSlide);
+            }, slideDuration);
+        });
+    }
+    
+    // Add keyboard navigation for accessibility
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            const prevSlide = (currentSlide - 1 + slideCount) % slideCount;
+            clearInterval(sliderInterval);
+            transitionToSlide(prevSlide);
+        } else if (e.key === 'ArrowRight') {
+            const nextSlide = (currentSlide + 1) % slideCount;
+            clearInterval(sliderInterval);
+            transitionToSlide(nextSlide);
+        }
+    });
+    
+    // Initialize first slide
+    gsap.set(slides[0], { opacity: 1, scale: 1.05 });
+    gsap.set(slides.slice(1), { opacity: 0, scale: 1 });
+    
+    // Add pan animation to first slide
+    gsap.to(slides[0], {
+        duration: slideDuration / 1000,
+        x: '-5%',
+        ease: 'sine.inOut',
+        repeat: 1,
+        yoyo: true
+    });
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        clearInterval(sliderInterval);
+    });
+    
+    console.log('Hero slider initialized with', slideCount, 'slides');
+}
+
+// Initialize hero slider when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    initHeroSlider();
+});
