@@ -781,3 +781,220 @@ document.addEventListener('DOMContentLoaded', () => {
     initTrustIndicators();
     initTestimonials();
 });
+
+
+// =========================================================
+// ENHANCED DASHBOARD ANIMATIONS
+// =========================================================
+
+function initEnhancedDashboard() {
+    const dashboard = document.querySelector('.container.py-5');
+    if (!dashboard) return;
+    
+    // Dashboard header animation
+    gsap.from('.dashboard-header', {
+        duration: 0.6,
+        y: -20,
+        opacity: 0,
+        ease: 'power2.out'
+    });
+    
+    // Member dashboard animations
+    const membershipCard = document.querySelector('.membership-card');
+    if (membershipCard) {
+        gsap.from('.membership-card', {
+            duration: 0.8,
+            y: 30,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: 0.2
+        });
+        
+        // Animate stat boxes
+        gsap.from('.stat-box', {
+            duration: 0.6,
+            scale: 0.8,
+            opacity: 0,
+            ease: 'back.out(1.7)',
+            stagger: 0.1,
+            delay: 0.5
+        });
+        
+        // Animate progress bar
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+            const targetWidth = progressBar.style.width;
+            gsap.from(progressBar, {
+                duration: 1.5,
+                width: '0%',
+                ease: 'power2.out',
+                delay: 0.8
+            });
+        }
+        
+        // Quick actions animation
+        gsap.from('.quick-actions-card', {
+            duration: 0.8,
+            x: 30,
+            opacity: 0,
+            ease: 'power2.out',
+            delay: 0.4
+        });
+        
+        gsap.from('.quick-action-btn', {
+            duration: 0.5,
+            x: -20,
+            opacity: 0,
+            ease: 'power2.out',
+            stagger: 0.1,
+            delay: 0.7
+        });
+    }
+    
+    // Admin dashboard animations
+    const statCards = document.querySelectorAll('.stat-card-dashboard');
+    if (statCards.length > 0) {
+        gsap.from(statCards, {
+            duration: 0.6,
+            y: 30,
+            opacity: 0,
+            ease: 'back.out(1.7)',
+            stagger: 0.1,
+            delay: 0.2
+        });
+        
+        // Animate stat values with counter effect
+        statCards.forEach((card, index) => {
+            const valueElement = card.querySelector('.stat-card-value');
+            if (valueElement) {
+                const targetValue = valueElement.textContent;
+                const numericValue = parseInt(targetValue.replace(/\D/g, ''));
+                
+                if (!isNaN(numericValue)) {
+                    gsap.from(valueElement, {
+                        duration: 1.5,
+                        textContent: 0,
+                        snap: { textContent: 1 },
+                        ease: 'power1.inOut',
+                        delay: 0.4 + (index * 0.1),
+                        onUpdate: function() {
+                            const currentValue = Math.round(this.targets()[0].textContent);
+                            valueElement.textContent = targetValue.includes('+') 
+                                ? currentValue + '+' 
+                                : currentValue;
+                        }
+                    });
+                }
+            }
+        });
+    }
+    
+    // Admin action cards animation
+    const adminCards = document.querySelectorAll('.admin-action-card');
+    if (adminCards.length > 0) {
+        gsap.from(adminCards, {
+            duration: 0.7,
+            y: 40,
+            opacity: 0,
+            ease: 'power2.out',
+            stagger: 0.15,
+            delay: 0.6
+        });
+    }
+    
+    // Trainer dashboard animations
+    const trainerCards = document.querySelectorAll('.trainer-action-card');
+    if (trainerCards.length > 0) {
+        gsap.from(trainerCards, {
+            duration: 0.8,
+            y: 30,
+            opacity: 0,
+            ease: 'power2.out',
+            stagger: 0.2,
+            delay: 0.3
+        });
+    }
+    
+    // Activity items animation
+    gsap.from('.activity-item', {
+        duration: 0.5,
+        x: -20,
+        opacity: 0,
+        ease: 'power2.out',
+        stagger: 0.1,
+        delay: 1
+    });
+}
+
+// Dashboard card hover interactions
+function initDashboardInteractions() {
+    // Stat card interactions
+    const statCards = document.querySelectorAll('.stat-card-dashboard');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            gsap.to(card, {
+                duration: 0.3,
+                y: -5,
+                boxShadow: '0 12px 24px rgba(15, 22, 33, 0.12)',
+                ease: 'power2.out'
+            });
+            
+            const icon = card.querySelector('.stat-card-icon');
+            if (icon) {
+                gsap.to(icon, {
+                    duration: 0.3,
+                    scale: 1.1,
+                    rotation: 5,
+                    ease: 'back.out(1.7)'
+                });
+            }
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, {
+                duration: 0.3,
+                y: 0,
+                boxShadow: 'var(--shadow-sm)',
+                ease: 'power2.out'
+            });
+            
+            const icon = card.querySelector('.stat-card-icon');
+            if (icon) {
+                gsap.to(icon, {
+                    duration: 0.3,
+                    scale: 1,
+                    rotation: 0,
+                    ease: 'power2.out'
+                });
+            }
+        });
+    });
+    
+    // Quick action button interactions
+    const quickActions = document.querySelectorAll('.quick-action-btn');
+    quickActions.forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            gsap.to(btn.querySelector('i'), {
+                duration: 0.2,
+                x: 5,
+                ease: 'power2.out'
+            });
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn.querySelector('i'), {
+                duration: 0.2,
+                x: 0,
+                ease: 'power2.out'
+            });
+        });
+    });
+}
+
+// Initialize enhanced dashboard on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname.includes('/dashboard')) {
+        initEnhancedDashboard();
+        initDashboardInteractions();
+    }
+});

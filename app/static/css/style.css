@@ -1856,3 +1856,333 @@ img {
     transform: none;
   }
 }
+
+
+/* =========================================================
+   DASHBOARD MODERNIZATION
+   ========================================================= */
+
+/* Dashboard Header */
+.dashboard-header {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border-radius: var(--r-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard-greeting {
+  animation: slideInLeft 0.6s ease;
+}
+
+.greeting-icon {
+  display: inline-block;
+  animation: wave 2s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  10%, 30% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  40% { transform: rotate(14deg); }
+  50% { transform: rotate(-4deg); }
+  60% { transform: rotate(10deg); }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Enhanced Membership Card */
+.membership-card {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(255,107,53,0.02) 100%);
+  border: 2px solid var(--border);
+  transition: all var(--t);
+}
+
+.membership-card:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-md);
+}
+
+/* Membership Progress */
+.membership-progress .progress {
+  background: rgba(0,0,0,0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.membership-progress .progress-bar {
+  border-radius: 10px;
+  transition: width 1s ease;
+}
+
+/* Stat Box with Icons */
+.stat-box {
+  position: relative;
+  padding: 1rem;
+  border-radius: var(--r-md);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  transition: all var(--t);
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--brand);
+}
+
+.stat-box-icon {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  color: var(--brand);
+  opacity: 0.2;
+  font-size: 1.5rem;
+}
+
+/* Quick Actions Card */
+.quick-actions-card {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(59,130,246,0.02) 100%);
+  border: 2px solid var(--border);
+}
+
+.quick-action-btn {
+  padding: 1rem;
+  text-align: left;
+  transition: all var(--t);
+  border: 1px solid var(--border);
+}
+
+.quick-action-btn:hover {
+  transform: translateX(5px);
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.quick-action-btn i {
+  font-size: 1.2rem;
+  width: 24px;
+  transition: transform var(--t);
+}
+
+.quick-action-btn:hover i {
+  transform: scale(1.2);
+}
+
+.activity-item {
+  padding: 0.5rem;
+  border-radius: var(--r-sm);
+  transition: background var(--t);
+}
+
+.activity-item:hover {
+  background: var(--bg);
+}
+
+/* Admin Dashboard Stats */
+.stat-card-dashboard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.5rem;
+  display: flex;
+  align-items-center;
+  gap: 1rem;
+  transition: all var(--t);
+  cursor: pointer;
+}
+
+.stat-card-dashboard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--brand);
+}
+
+.stat-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.stat-card-value {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.stat-card-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Admin Action Cards */
+.admin-action-card {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--t);
+  border: 2px solid var(--border);
+}
+
+.admin-action-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+}
+
+.admin-action-card:hover::before {
+  left: 100%;
+}
+
+.admin-action-card:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
+}
+
+/* Trainer Dashboard Cards */
+.trainer-action-card {
+  border: 2px solid var(--border);
+  transition: all var(--t);
+}
+
+.trainer-action-card:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.trainer-card-stats {
+  background: var(--bg);
+  border-radius: var(--r-md);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.trainer-card-info ul {
+  margin-bottom: 0;
+}
+
+.trainer-card-info li {
+  margin-bottom: 0.25rem;
+}
+
+/* Dashboard Animations */
+.stat-card-dashboard,
+.admin-action-card,
+.trainer-action-card {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.stat-card-dashboard:nth-child(1) { animation-delay: 0.1s; }
+.stat-card-dashboard:nth-child(2) { animation-delay: 0.2s; }
+.stat-card-dashboard:nth-child(3) { animation-delay: 0.3s; }
+.stat-card-dashboard:nth-child(4) { animation-delay: 0.4s; }
+
+.admin-action-card:nth-child(1) { animation-delay: 0.2s; }
+.admin-action-card:nth-child(2) { animation-delay: 0.3s; }
+.admin-action-card:nth-child(3) { animation-delay: 0.4s; }
+.admin-action-card:nth-child(4) { animation-delay: 0.5s; }
+
+/* Mobile Dashboard Optimizations */
+@media (max-width: 767.98px) {
+  .dashboard-header {
+    padding: 1rem;
+  }
+  
+  .dashboard-greeting {
+    font-size: 1.5rem !important;
+  }
+  
+  .greeting-icon {
+    font-size: 1.5rem;
+  }
+  
+  .stat-box {
+    padding: 0.75rem;
+  }
+  
+  .stat-box-icon {
+    font-size: 1.2rem;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .quick-action-btn {
+    padding: 0.75rem;
+  }
+  
+  .stat-card-dashboard {
+    padding: 1rem;
+  }
+  
+  .stat-card-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+  
+  .stat-card-value {
+    font-size: 1.5rem;
+  }
+  
+  .admin-action-card,
+  .trainer-action-card {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .stat-card-dashboard {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .stat-card-icon {
+    margin: 0 auto;
+  }
+}
+
+/* Progress bar animation */
+@keyframes progressBar {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
+.progress-bar {
+  animation: progressBar 1s ease-out;
+}
+
+/* Empty state enhancement */
+.empty-state {
+  animation: fadeInUp 0.8s ease;
+}
