@@ -5,6 +5,7 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_compress import Compress
 
 from config import get_config
 from app.utils.logger import configure_logging
@@ -15,6 +16,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address)
+compress = Compress()
 
 
 def create_app(config_class=None):
@@ -30,6 +32,7 @@ def create_app(config_class=None):
     login_manager.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
+    compress.init_app(app)
 
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
@@ -76,4 +79,4 @@ def create_app(config_class=None):
     return app
 
 
-__all__ = ['create_app', 'db', 'login_manager', 'csrf', 'limiter']
+__all__ = ['create_app', 'db', 'login_manager', 'csrf', 'limiter', 'compress']

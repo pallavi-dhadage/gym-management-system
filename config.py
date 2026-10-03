@@ -53,6 +53,15 @@ class Config:
     SCHEDULER_ENABLED = _bool('SCHEDULER_ENABLED', True)
     SCHEDULER_HOUR = int(os.environ.get('SCHEDULER_HOUR', 2))
 
+    # Performance optimizations
+    COMPRESS_MIMETYPES = [
+        'text/html', 'text/css', 'text/xml', 'application/json',
+        'application/javascript', 'text/javascript'
+    ]
+    COMPRESS_LEVEL = 6
+    COMPRESS_MIN_SIZE = 500
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(hours=12)  # Static file caching
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
