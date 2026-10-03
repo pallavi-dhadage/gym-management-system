@@ -78,10 +78,42 @@ Trust boundaries:
 - **CSRF**: Flask-WTF on all state-changing forms.
 - **Rate limiting**: Flask-Limiter; stricter limits on auth and enquiry routes.
 - **Honeypot field** on public enquiry form silently drops bot submissions.
-- **Safe redirects**: `_is_safe_url()` only allows same-host redirects after login.
+- **Safe redirects**: `is_safe_url()` only allows same-host redirects after login.
 - **Audit trail**: admin actions recorded with actor email, IP, timestamp.
 - **Scheduler isolation**: APScheduler runs only in the Flask child process; disabled under testing.
 - **Secret hygiene**: `.env` excluded via `.gitignore`; production secrets from environment only.
+- **Enhanced CSP**: Updated Content Security Policy to allow GSAP animations and Unsplash images while maintaining security.
+- **Input validation**: Strict validation on all user inputs including UTR format, email format, and filename sanitization.
+- **Password strength**: Enhanced password validation beyond basic requirements, checking for common weak passwords.
+- **Request origin verification**: Check origin and referer headers to prevent CSRF attacks.
+- **Security logging**: Structured logging of all security events with IP, user agent, and referer information.
+- **Error handling**: Enhanced error handlers with detailed security logging and proper JSON/HTML responses.
+- **File upload safety**: Filename sanitization to prevent path traversal attacks.
+- **Email validation**: Enhanced email format validation with additional checks for malformed addresses.
+
+## Security Enhancements (Module 8)
+
+### Frontend Security
+- Animations respect `prefers-reduced-motion` for accessibility
+- All external resources loaded from trusted CDNs only
+- Background images loaded via HTTPS from Unsplash
+- No inline JavaScript except for GSAP initialization
+- CSRF tokens included in all forms
+
+### Backend Security
+- Enhanced error logging with IP, user agent, and referer tracking
+- Password strength validation beyond basic requirements
+- UTR format validation with strict regex patterns
+- Email format validation with malformed address detection
+- Filename sanitization for upload safety
+- Request origin verification for CSRF prevention
+
+### Monitoring & Logging
+- Security events logged with structured data
+- Enhanced audit trail with detailed context
+- Separate logging for security vs application events
+- Rate limit violations logged with full request context
+- Unhandled exceptions logged with IP and request details
 
 ## Responsible Disclosure
 
